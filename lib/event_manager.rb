@@ -26,15 +26,12 @@ def clean_zipcode(zipcode)
 end
 
 def clean_phone_num(num)
-
     clean_num = String.new
-    
-
+ 
     num.to_s.split("").each do |character|
         clean_num << character if character.match(/\d/)
     end
 
-    
     if clean_num.length == 10
         num = clean_num
     elsif clean_num[0] == "1" && clean_num.length == 11
@@ -44,11 +41,7 @@ def clean_phone_num(num)
     end
 
     reg_num = num.match(/(\d{3})(\d{3})(\d{4})/)
-
-    num = "#{reg_num[1]}.#{reg_num[2]}.#{reg_num[3]}" if num.length == 10
-
-
-        
+    num = "#{reg_num[1]}.#{reg_num[2]}.#{reg_num[3]}" if num.length == 10     
 end
 
 def legislators_by_zipcode(zip)
@@ -70,14 +63,12 @@ def save_thank_you_letters(id, form_letter)
     Dir.mkdir("output") unless Dir.exists? "output"
 
     filename = "output/thanks_#{id}.html"
-
     File.open(filename, 'w') do |file|
         file.puts form_letter
     end
 end
 
 puts "EventManager Initialized!"
-
 
 hours_hash = {}
 days_hash = {}
@@ -115,7 +106,6 @@ contents.each do |row|
     end
 
     puts "#{name} #{phone_num}"
-
 end
 
 puts "\nBest Hours: "
@@ -129,4 +119,3 @@ days_hash = days_hash.sort_by { |key, val| val }
 days_hash.reverse.each do |key, val|
     puts "#{val} users registered on #{key}"
 end
-
