@@ -4,6 +4,23 @@ require 'erb'
 
 
 
+# Return string for registered hour
+def get_hour(reg_time)
+    time = clean_time(reg_time)
+    hour = time.strftime("%I %P")
+end
+
+# Return string for registered day
+def get_day(reg_time)
+    time = clean_time(reg_time)
+    day = time.strftime("%A")
+end
+
+# Take user time and create proper DateTime instance
+def clean_time(dirty_time)
+    DateTime.strptime(dirty_time, '%m/%d/%y %k:%M')
+end
+
 def clean_zipcode(zipcode)
     zipcode.to_s.rjust(5,"0")[0..4]
 end
@@ -22,6 +39,8 @@ def clean_phone_num(num)
         num = clean_num
     elsif clean_num[0] == "1" && clean_num.length == 11
         num = clean_num[1..-1]
+    else
+        return "invalid phone number"
     end
 
     reg_num = num.match(/(\d{3})(\d{3})(\d{4})/)
@@ -60,6 +79,9 @@ end
 puts "EventManager Initialized!"
 
 
+hours_hash = {}
+days_hash = {}
+
 contents = CSV.open "event_attendees.csv", headers: true, header_converters: :symbol
 
 template_letter = File.read "form_letter.erb"
@@ -78,6 +100,33 @@ contents.each do |row|
 
     save_thank_you_letters(id, form_letter)
 
+    hour = get_hour(row[:regdate])
+    if hours_hash[hour].nil?
+        hours_hash[hour] = 1
+    else
+        hours_hash[hour] += 1
+    end
+
+    day = get_day(row[:regdate])
+    if days_hash[day].nil?
+        days_hash[day] = 1
+    else
+        days_hash[day] += 1
+    end
+
     puts "#{name} #{phone_num}"
 
 end
+
+puts "\nBest Hours: "
+hours_hash = hours_hash.sort_by { |key, val| val }
+hours_hash.reverse.each do |key, val|
+    puts "#{val} users registered at #{key}"
+end
+
+puts "\nBest Days:"
+days_hash = days_hash.sort_by { |key, val| val }
+days_hash.reverse.each do |key, val|
+    puts "#{val} users registered on #{key}"
+end
+
